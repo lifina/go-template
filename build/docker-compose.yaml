@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  server-api:
+    build:
+      context: ../
+      dockerfile: build/server/development.dockerfile
+    command:
+      [
+        bgo,
+        server,
+        --port,
+        "8080",
+        --dbHost,
+        server-database,
+        --dbUser,
+        root,
+        --dbPass,
+        HqdhrbLfQu2JUobR,
+        --dbName,
+        bgo,
+      ]
+    depends_on:
+      - server-database
+    entrypoint:
+      - dockerize
+      - -timeout
+      - 30s
+      - -wait
+      - tcp://server-database:3306
+    ports:
+      - "8080:8080"
+  server-database:
+    build:
+      context: ../
+      dockerfile: build/server/mysql.dockerfile
+    volumes:
+      - ../database/server:/sql
+      - ../database/server:/docker-entrypoint-initdb.d
+    environment:
+      TZ: "Asia/Tokyo"
+      MYSQL_ROOT_PASSWORD: HqdhrbLfQu2JUobR
+    ports:
+      - "3306:3306"
